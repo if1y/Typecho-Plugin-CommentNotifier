@@ -30,6 +30,7 @@ class CommentNotifier_Action extends Typecho_Widget implements Widget_Interface_
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
             $mail->Encoding = PHPMailer::ENCODING_BASE64;
             $mail->isSMTP();
+            $mail->Timeout = 10; // SMTP 超时(秒)
             $mail->Host = $plugin->STMPHost; // SMTP 服务地址
             $mail->SMTPAuth = true; // 开启认证
             $mail->Username = $plugin->SMTPUserName; // SMTP 用户名

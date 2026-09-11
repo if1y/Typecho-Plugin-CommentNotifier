@@ -11,7 +11,6 @@ use Typecho\Db;
 use Typecho\Date;
 use Utils\Helper;
 use Widget\Feedback;
-use Widget\Service;
 use Widget\Comments\Edit;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -36,6 +35,16 @@ class Plugin implements PluginInterface
     public static $panel = 'CommentNotifier/console.php';
 
     /**
+     * @var array 待异步发送的邮件队列(响应后在本进程内统一发送)
+     */
+    private static $asyncMailQueue = [];
+
+    /**
+     * @var bool 收尾回调是否已注册, 保证只注册一次
+     */
+    private static $asyncFlushRegistered = false;
+
+    /**
      * 激活插件方法,如果激活失败,直接抛出异常
      *
      * @access public
@@ -45,7 +54,6 @@ class Plugin implements PluginInterface
     {
         Feedback::pluginHandle()->finishComment = __CLASS__ . '::refinishComment'; // 前台提交评论完成接口
         Edit::pluginHandle()->finishComment = __CLASS__ . '::refinishComment'; // 后台操作评论完成接口
-        Service::pluginHandle()->send = __CLASS__ . '::send';//异步接口
         
         Edit::pluginHandle()->mark = __CLASS__ . '::mark'; // 后台标记评论状态完成接口
         Helper::addPanel(1, self::$panel, '评论邮件提醒外观', '评论邮件提醒主题列表', 'administrator');
@@ -181,7 +189,7 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
         $api_section->html('<h2>API发送设置</h2>');
         $form->addItem($ali_section);
         // 发件api
-        $api_url = new Form\Element\Text('api_url', NULL, NULL, _t('api地址'), _t('请填写用于发送的api链接，需要服务器支持curl函数，部分虚拟主机可能并不能用curl,自己api将插件目录下的zemailapi文件夹放到用于构建api的服务器，然后配置config.php文件即可'));
+        $api_url = new Form\Element\Text('api_url', NULL, NULL, _t('api地址'), _t('请填写用于发送的api链接，需要服务器支持curl函数，部分虚拟主机可能并不能用curl,自己api将插件目录下的zemailapi文件夹放到用于构建api的服务器，然后配置config.php文件即可<br>公益API：https://typecho.fans/mailapi/mail/?auth=storetypechofans （仅用于测试，随时可能倒闭）'));
         $form->addInput($api_url);
         
         $api_url->setAttribute('class', 'typecho-option api');
@@ -421,9 +429,70 @@ public static function resendMail($param)
         if($plugin->zznotice==1&&$param['to']==$plugin->adminfrom){return;}//不通知站长邮箱
         
         if($plugin->yibu==1){
-        Helper::requestService('send', $param);
+        // 启用异步时: 仅入队, 待响应发出后在本进程内统一发送(不走HTTP回环, 不依赖额外worker)
+        self::queueAsyncMail($param);
         }else{
         self::send($param);
+        }
+    }
+
+    /**
+     * 将邮件压入异步队列, 并确保收尾回调已注册(只注册一次)
+     *
+     * @param array $param 邮件参数
+     * @return void
+     */
+    private static function queueAsyncMail($param)
+    {
+        self::$asyncMailQueue[] = $param;
+        if (!self::$asyncFlushRegistered) {
+            self::$asyncFlushRegistered = true;
+            register_shutdown_function([__CLASS__, 'flushAsyncMailQueue']);
+        }
+    }
+
+    /**
+     * 收尾回调: 先尽力将响应推送给用户, 再在本进程内发送队列中的邮件
+     * 兼容 PHP-FPM(fastcgi_finish_request) / LiteSpeed / 其它环境(flush兜底)
+     *
+     * @return void
+     */
+    public static function flushAsyncMailQueue()
+    {
+        if (empty(self::$asyncMailQueue)) {
+            return;
+        }
+        // 取出队列并清空, 避免重复发送
+        $queue = self::$asyncMailQueue;
+        self::$asyncMailQueue = [];
+
+        // ① 优先将响应推送给用户, 其后代码用户无感
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        } elseif (function_exists('litespeed_finish_request')) {
+            litespeed_finish_request();
+        } else {
+            // 通用兜底: 关闭并刷新输出缓冲, 释放session锁
+            while (ob_get_level() > 0) {
+                @ob_end_flush();
+            }
+            @flush();
+            if (session_id()) {
+                session_write_close();
+            }
+        }
+
+        // ② 允许脚本在客户端断开后继续执行, 解除执行时间限制
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
+
+        // ③ 逐个发送
+        foreach ($queue as $param) {
+            self::send($param);
         }
     }
 public static function send($param){
@@ -463,6 +532,7 @@ try {
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
             $mail->Encoding = PHPMailer::ENCODING_BASE64;
             $mail->isSMTP();
+            $mail->Timeout = 10; // SMTP 超时(秒), 防止收尾阶段卡死占用worker
             $mail->Host = $plugin->STMPHost; // SMTP 服务地址
             $mail->SMTPAuth = true; // 开启认证
             $mail->Username = $plugin->SMTPUserName; // SMTP 用户名
