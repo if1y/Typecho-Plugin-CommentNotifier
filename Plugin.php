@@ -23,7 +23,7 @@ require dirname(__FILE__) . '/PHPMailer/Exception.php';
  * Typecho 评论邮件提醒，基于 fastcgi_finish_request 的进程内异步发信方案
  * 
  * @package CommentNotifier
- * @author  if1y
+ * @author  WannαFly
  * @version 2.0.0
  * @link    https://github.com/if1y/Typecho-Plugin-CommentNotifier
  */
