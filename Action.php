@@ -23,20 +23,20 @@ class CommentNotifier_Action extends Typecho_Widget implements Widget_Interface_
             echo '密钥不正确';
         }else{
         try {
-            $from = $plugin->from; // 发件邮箱
-            $fromName = $plugin->fromName; // 发件人
+            $from = $plugin->smtp_from; // 发件邮箱
+            $fromName = $plugin->from_name; // 发件人
             // Server settings
             $mail = new PHPMailer(false);
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
             $mail->Encoding = PHPMailer::ENCODING_BASE64;
             $mail->isSMTP();
             $mail->Timeout = 10; // SMTP 超时(秒)
-            $mail->Host = $plugin->STMPHost; // SMTP 服务地址
+            $mail->Host = $plugin->smtp_host; // SMTP 服务地址
             $mail->SMTPAuth = true; // 开启认证
-            $mail->Username = $plugin->SMTPUserName; // SMTP 用户名
-            $mail->Password = $plugin->SMTPPassword; // SMTP 密码
-            $mail->SMTPSecure = $plugin->SMTPSecure; // SMTP 加密类型 'ssl' or 'tls'.
-            $mail->Port = $plugin->SMTPPort; // SMTP 端口
+            $mail->Username = $plugin->smtp_user; // SMTP 用户名
+            $mail->Password = $plugin->smtp_pass; // SMTP 密码
+            $mail->SMTPSecure = $plugin->smtp_secure; // SMTP 加密类型 'ssl' or 'tls'.
+            $mail->Port = $plugin->smtp_port; // SMTP 端口
 
             $mail->setFrom($from, $fromName);
             $mail->addAddress($_REQUEST['to'], $_REQUEST['fromName']); // 收件人

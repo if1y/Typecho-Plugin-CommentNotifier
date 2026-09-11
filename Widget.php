@@ -61,7 +61,7 @@ class CommentNotifier_Widget extends Typecho_Widget
     public function doForgot()
     {
         $plugin = Options::alloc()->plugin('CommentNotifier');
-        if(!in_array('passport', $plugin->tool)){$this->response->redirect($this->options->siteUrl);}
+        if(!in_array('password_reset', $plugin->password_reset)){$this->response->redirect($this->options->siteUrl);}
         require_once 'passport/forgot.php';
         if($user->hasLogin()){$this->notice->set(_t('当前账号处于登录状态，请在后台直接重置密码即可！'), 'error');exit;}
 
@@ -109,7 +109,7 @@ class CommentNotifier_Widget extends Typecho_Widget
     public function doReset()
     {
         $plugin = Options::alloc()->plugin('CommentNotifier');
-        if(!in_array('passport', $plugin->tool)){$this->response->redirect($this->options->siteUrl);}
+        if(!in_array('password_reset', $plugin->password_reset)){$this->response->redirect($this->options->siteUrl);}
         /* 验证token */
         $token = $this->request->filter('strip_tags', 'trim', 'xss')->token;
         list($uid, $hashValidate, $timeStamp) = explode('.', base64_decode($token));

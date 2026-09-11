@@ -96,12 +96,12 @@ class Plugin implements PluginInterface
         </style>
         <script>
 window.onload = function () {
-$('.'+$("#tuisongtype :radio:checked").val()).show();
-$('#tuisongtype input').click(function(){
+$('.'+$("#driver :radio:checked").val()).show();
+$('#driver input').click(function(){
 $('.smtp').hide();
 $('.aliyun').hide();
 $('.api').hide();
-$('.'+$("#tuisongtype :radio:checked").val()).show();
+$('.'+$("#driver :radio:checked").val()).show();
      });
 }
         </script>
@@ -110,28 +110,28 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
         $log = new Form\Element\Checkbox('log', array('ok' => _t('记录日志')), [], _t('记录日志'), _t('启用后将当前目录生成一个log.txt 注:目录需有写入权限'));
         $form->addInput($log->multiMode());
         
-        $yibu = new Form\Element\Radio('yibu', array('0' => _t('不启用'), '1' => _t('启用'),), '0', _t('异步提交'), _t('异步回调优点就是减小对博客评论提交速度的影响'));
-        $form->addInput($yibu);
+        $async = new Form\Element\Radio('async', array('0' => _t('不启用'), '1' => _t('启用'),), '0', _t('异步提交'), _t('异步回调优点就是减小对博客评论提交速度的影响'));
+        $form->addInput($async);
 
         // 发信方式
-        $tuisongtype = new Form\Element\Radio('tuisongtype', array('smtp' => _t('SMTP'), 'aliyun' => _t('阿里云推送'), 'api' => _t('通过api')), 'smtp', _t('邮件推送方式'));
-        $form->addInput($tuisongtype);
-        $tuisongtype->setAttribute('id', 'tuisongtype');
+        $driver = new Form\Element\Radio('driver', array('smtp' => _t('SMTP'), 'aliyun' => _t('阿里云推送'), 'api' => _t('通过api')), 'smtp', _t('邮件推送方式'));
+        $form->addInput($driver);
+        $driver->setAttribute('id', 'driver');
 
-        $stmplayout = new Layout();
-        $stmplayout->html(_t('<h3>邮件SMTP服务配置:</h3>'));
-        $form->addItem($stmplayout);
+        $smtpLayout = new Layout();
+        $smtpLayout->html(_t('<h3>邮件SMTP服务配置:</h3>'));
+        $form->addItem($smtpLayout);
         // SMTP服务地址
-        $STMPHost = new Form\Element\Text('STMPHost', NULL, 'smtp.qq.com', _t('SMTP服务器地址'), _t('如:smtp.163.com,smtp.gmail.com,smtp.exmail.qq.com,smtp.sohu.com,smtp.sina.com'));
-        $form->addInput($STMPHost);
+        $smtpHost = new Form\Element\Text('smtp_host', NULL, 'smtp.qq.com', _t('SMTP服务器地址'), _t('如:smtp.163.com,smtp.gmail.com,smtp.exmail.qq.com,smtp.sohu.com,smtp.sina.com'));
+        $form->addInput($smtpHost);
 
         // SMTP用户名
-        $SMTPUserName = new Form\Element\Text('SMTPUserName', NULL, NULL, _t('SMTP登录用户'), _t('SMTP登录用户名，一般为邮箱地址'));
-        $form->addInput($SMTPUserName);
+        $smtpUser = new Form\Element\Text('smtp_user', NULL, NULL, _t('SMTP登录用户'), _t('SMTP登录用户名，一般为邮箱地址'));
+        $form->addInput($smtpUser);
 
         // 发件邮箱
-        $from = new Form\Element\Text('from', NULL, NULL, _t('SMTP邮箱地址'), _t('请填写用于发送邮件的邮箱，一般与SMTP登录用户名一致'));
-        $form->addInput($from);
+        $smtpFrom = new Form\Element\Text('smtp_from', NULL, NULL, _t('SMTP邮箱地址'), _t('请填写用于发送邮件的邮箱，一般与SMTP登录用户名一致'));
+        $form->addInput($smtpFrom);
 
         // SMTP密码
         $description = _t('一般为邮箱登录密码, 有特殊如: QQ邮箱有独立的SMTP密码. 可参考: ');
@@ -139,60 +139,60 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
         $description .= '<a href="https://mailhelp.aliyun.com/freemail/detail.vm?knoId=6521875" target="_blank">阿里邮箱</a> ';
         $description .= '<a href="https://support.office.com/zh-cn/article/outlook-com-%E7%9A%84-pop%E3%80%81imap-%E5%92%8C-smtp-%E8%AE%BE%E7%BD%AE-d088b986-291d-42b8-9564-9c414e2aa040?ui=zh-CN&rs=zh-CN&ad=CN" target="_blank">Outlook邮箱</a> ';
         $description .= '<a href="http://help.sina.com.cn/comquestiondetail/view/160/" target="_blank">新浪邮箱</a> ';
-        $SMTPPassword = new Form\Element\Text('SMTPPassword', NULL, NULL, _t('SMTP登录密码'), $description);
-        $form->addInput($SMTPPassword);
+        $smtpPass = new Form\Element\Text('smtp_pass', NULL, NULL, _t('SMTP登录密码'), $description);
+        $form->addInput($smtpPass);
 
         // 服务器安全模式
-        $SMTPSecure = new Form\Element\Radio('SMTPSecure', array('' => _t('无安全加密'), 'ssl' => _t('SSL加密'), 'tls' => _t('TLS加密')), '', _t('SMTP加密模式'));
-        $form->addInput($SMTPSecure);
+        $smtpSecure = new Form\Element\Radio('smtp_secure', array('' => _t('无安全加密'), 'ssl' => _t('SSL加密'), 'tls' => _t('TLS加密')), '', _t('SMTP加密模式'));
+        $form->addInput($smtpSecure);
 
         // SMTP server port
-        $SMTPPort = new Form\Element\Text('SMTPPort', NULL, '25', _t('SMTP服务端口'), _t('默认25 SSL为465 TLS为587'));
-        $form->addInput($SMTPPort);
-        $stmplayout->setAttribute('class', 'typecho-option smtp');
-        $STMPHost->setAttribute('class', 'typecho-option smtp');
-        $SMTPUserName->setAttribute('class', 'typecho-option smtp');
-        $from->setAttribute('class', 'typecho-option smtp');
-        $SMTPPassword->setAttribute('class', 'typecho-option smtp');
-        $SMTPSecure->setAttribute('class', 'typecho-option smtp');
-        $SMTPPort->setAttribute('class', 'typecho-option smtp');
+        $smtpPort = new Form\Element\Text('smtp_port', NULL, '25', _t('SMTP服务端口'), _t('默认25 SSL为465 TLS为587'));
+        $form->addInput($smtpPort);
+        $smtpLayout->setAttribute('class', 'typecho-option smtp');
+        $smtpHost->setAttribute('class', 'typecho-option smtp');
+        $smtpUser->setAttribute('class', 'typecho-option smtp');
+        $smtpFrom->setAttribute('class', 'typecho-option smtp');
+        $smtpPass->setAttribute('class', 'typecho-option smtp');
+        $smtpSecure->setAttribute('class', 'typecho-option smtp');
+        $smtpPort->setAttribute('class', 'typecho-option smtp');
 
 
 
         // 阿里云推送区块
-        $ali_section = new Layout();
+        $aliyunSection = new Layout();
         // 区块标题
-        $ali_section->html('<h2>阿里云推送邮件发送设置</h2>');
-        $form->addItem($ali_section);
+        $aliyunSection->html('<h2>阿里云推送邮件发送设置</h2>');
+        $form->addItem($aliyunSection);
         // 发件邮箱
-        $ali_from = new Form\Element\Text('ali_from', NULL, NULL, _t('阿里云邮箱地址'), _t('请填写用于发送邮件的邮箱'));
-        $form->addInput($ali_from);
+        $aliyunFrom = new Form\Element\Text('aliyun_from', NULL, NULL, _t('阿里云邮箱地址'), _t('请填写用于发送邮件的邮箱'));
+        $form->addInput($aliyunFrom);
         // 地域选择
-        $ali_region = new Form\Element\Select('ali_region', array('hangzhou' => _t('华东1(杭州)'), 'singapore' => _t('亚太东南1(新加坡)'), 'sydney' => _t('亚太东南2(悉尼)')), NULL, _t('DM接入区域'), _t('请选择您的邮件推送所在服务器区域，请务必选择正确'));
-        $form->addInput($ali_region);
+        $aliyunRegion = new Form\Element\Select('aliyun_region', array('hangzhou' => _t('华东1(杭州)'), 'singapore' => _t('亚太东南1(新加坡)'), 'sydney' => _t('亚太东南2(悉尼)')), NULL, _t('DM接入区域'), _t('请选择您的邮件推送所在服务器区域，请务必选择正确'));
+        $form->addInput($aliyunRegion);
         // AccessKey ID
-        $ali_accesskey_id = new Form\Element\Text('ali_accesskey_id', NULL, NULL, _t('AccessKey ID'), _t('请填入在阿里云生成的AccessKey ID'));
-        $form->addInput($ali_accesskey_id);
+        $aliyunAccesskeyId = new Form\Element\Text('aliyun_accesskey_id', NULL, NULL, _t('AccessKey ID'), _t('请填入在阿里云生成的AccessKey ID'));
+        $form->addInput($aliyunAccesskeyId);
         // Access Key Secret
-        $ali_accesskey_secret = new Form\Element\Text('ali_accesskey_secret', NULL, NULL, _t('Access Key Secret'), _t('请填入在阿里云生成的Access Key Secret'));
-        $form->addInput($ali_accesskey_secret);
-        $ali_section->setAttribute('class', 'typecho-option aliyun');
-        $ali_region->setAttribute('class', 'typecho-option aliyun');
-        $ali_from->setAttribute('class', 'typecho-option aliyun');
-        $ali_accesskey_id->setAttribute('class', 'typecho-option aliyun');
-        $ali_accesskey_secret->setAttribute('class', 'typecho-option aliyun');
+        $aliyunAccesskeySecret = new Form\Element\Text('aliyun_accesskey_secret', NULL, NULL, _t('Access Key Secret'), _t('请填入在阿里云生成的Access Key Secret'));
+        $form->addInput($aliyunAccesskeySecret);
+        $aliyunSection->setAttribute('class', 'typecho-option aliyun');
+        $aliyunRegion->setAttribute('class', 'typecho-option aliyun');
+        $aliyunFrom->setAttribute('class', 'typecho-option aliyun');
+        $aliyunAccesskeyId->setAttribute('class', 'typecho-option aliyun');
+        $aliyunAccesskeySecret->setAttribute('class', 'typecho-option aliyun');
         
         
         // api推送区块
-        $api_section = new Layout();
+        $apiSection = new Layout();
         // 区块标题
-        $api_section->html('<h2>API发送设置</h2>');
-        $form->addItem($ali_section);
+        $apiSection->html('<h2>API发送设置</h2>');
+        $form->addItem($apiSection);
         // 发件api
-        $api_url = new Form\Element\Text('api_url', NULL, NULL, _t('api地址'), _t('请填写用于发送的api链接，需要服务器支持curl函数，部分虚拟主机可能并不能用curl,自己api将插件目录下的zemailapi文件夹放到用于构建api的服务器，然后配置config.php文件即可<br>公益API：https://typecho.fans/mailapi/mail/?auth=storetypechofans （仅用于测试，随时可能倒闭）'));
-        $form->addInput($api_url);
+        $apiUrl = new Form\Element\Text('api_url', NULL, NULL, _t('api地址'), _t('请填写用于发送的api链接，需要服务器支持curl函数，部分虚拟主机可能并不能用curl,自己api将插件目录下的zemailapi文件夹放到用于构建api的服务器，然后配置config.php文件即可<br>公益API：https://typecho.fans/mailapi/mail/?auth=storetypechofans （仅用于测试，随时可能倒闭）'));
+        $form->addInput($apiUrl);
         
-        $api_url->setAttribute('class', 'typecho-option api');
+        $apiUrl->setAttribute('class', 'typecho-option api');
 
 
         $layout = new Layout();
@@ -200,29 +200,29 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
         $form->addItem($layout);
 
         // 发件人姓名
-        $fromName = new Form\Element\Text('fromName', NULL, NULL, _t('发件人昵称'), _t('发件人昵称'));
+        $fromName = new Form\Element\Text('from_name', NULL, NULL, _t('发件人昵称'), _t('发件人昵称'));
         $form->addInput($fromName->addRule('required', _t('发件人昵称必填!')));
 
         // 收件邮箱
-        $adminfrom = new Form\Element\Text('adminfrom', NULL, NULL, _t('站长收件邮箱'), _t('遇到待审核评论或文章作者邮箱为空时，评论提醒会发送到此邮箱地址！'));
-        $form->addInput($adminfrom->addRule('required', _t('收件邮箱必填!')));
+        $adminMail = new Form\Element\Text('admin_mail', NULL, NULL, _t('站长收件邮箱'), _t('遇到待审核评论或文章作者邮箱为空时，评论提醒会发送到此邮箱地址！'));
+        $form->addInput($adminMail->addRule('required', _t('收件邮箱必填!')));
         
         
-        $zznotice = new Form\Element\Radio('zznotice', array('0' => _t('通知'), '1' => _t('不通知'),), '0', _t('是否通知站长'), _t('因为站长可能有其他接受评论通知的方式，不想在重复接受邮件通知可选择不通知'));
-        $form->addInput($zznotice);
+        $notifyAdmin = new Form\Element\Radio('notify_admin', array('0' => _t('不通知'), '1' => _t('通知'),), '1', _t('是否通知站长'), _t('因为站长可能有其他接受评论通知的方式，不想在重复接受邮件通知可选择不通知'));
+        $form->addInput($notifyAdmin);
         
         
         $rewrite='';if(Helper::options()->rewrite==0){$rewrite='index.php/';}
         $apiurl=Helper::options()->siteUrl.$rewrite.'zemail';
-        $testurl='#'; 
+        $testurl='#';
         if(empty($_GET['activate'])){
         $plugin = Helper::options()->plugin('CommentNotifier');
-        $testurl=$apiurl.'?subject=标题&html=测试内容&to='.$plugin->adminfrom.'&fromName='.$plugin->fromName.'&auth='.$plugin->auth;
+        $testurl=$apiurl.'?subject=标题&html=测试内容&to='.$plugin->admin_mail.'&fromName='.$plugin->from_name.'&auth='.$plugin->auth;
         }
         
         // 表情重载函数
-        $biaoqing = new Form\Element\Text('biaoqing', NULL, NULL, _t('表情重载'), _t('请填写您博客主题评论表情函数名，如：parseBiaoQing（我的Plain,Sinner,Dinner,Store主题），Mirages::parseBiaoqing（Mirages主题），（此项非必填项具体函数名请咨询主题作者，填写后邮件提醒将支持显示表情，更换主题后请同步更换此项内容或者删除此项内容）<p class="smtp">设置好插件所有设置参数并保存设置后，可以点击下方链接进行测试邮件是否发信正常<br><a href="'.$testurl.'" target="_blank" rel="noopener noreferrer">点击测试邮件发信是否正常【仅适用于SMTP模式】</a></p>'));
-        $form->addInput($biaoqing);
+        $biaoqingParser = new Form\Element\Text('biaoqing_parser', NULL, NULL, _t('表情重载'), _t('请填写您博客主题评论表情函数名，如：parseBiaoQing（我的Plain,Sinner,Dinner,Store主题），Mirages::parseBiaoqing（Mirages主题），（此项非必填项具体函数名请咨询主题作者，填写后邮件提醒将支持显示表情，更换主题后请同步更换此项内容或者删除此项内容）<p class="smtp">设置好插件所有设置参数并保存设置后，可以点击下方链接进行测试邮件是否发信正常<br><a href="'.$testurl.'" target="_blank" rel="noopener noreferrer">点击测试邮件发信是否正常【仅适用于SMTP模式】</a></p>'));
+        $form->addInput($biaoqingParser);
         
         
         // 模板
@@ -245,10 +245,10 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
         $layout->html(_t('<h3>拓展功能:</h3>'));
         $form->addItem($layout);
         
-        $tool = new Form\Element\Checkbox('tool', [
+        $passport = new Form\Element\Checkbox('passport', [
             'passport' => _t('密码找回功能'),
         ], [], _t('周边能力拓展'), _t('密码找回功能开启后会在typecho默认登录页面插入“忘记密码”的按钮，其他位置如需适配，找回链接为：你的域名/password/forgot 请自行添加'));
-        $form->addInput($tool->multiMode());
+        $form->addInput($passport->multiMode());
     }
 
     /**
@@ -303,7 +303,7 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
         $db = Db::get();
         $ae = $db->fetchRow($db->select()->from('table.users')->where('table.users.uid=?', $comment->ownerId));
         if (empty($ae['mail'])) {
-            $ae['mail'] = $plugin->adminfrom;
+            $ae['mail'] = $plugin->admin_mail;
         }
         $recipients = [
             'name' => $ae['screenName'],
@@ -325,7 +325,7 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
     {
         $recipients = [];
         $plugin = Options::alloc()->plugin('CommentNotifier');
-        $from = $plugin->adminfrom; // 站长邮箱
+        $from = $plugin->admin_mail; // 站长邮箱
         // 在后台标记评论状态为[approved 审核通过]时, 发信给上级评论人或作者
         if ($status == 'approved') {
             $type = 0;
@@ -364,8 +364,8 @@ $('.'+$("#tuisongtype :radio:checked").val()).show();
     public static function refinishComment($comment)
     {
         $plugin = Options::alloc()->plugin('CommentNotifier');
-        $from = $plugin->adminfrom; // 站长邮箱
-        $fromName = $plugin->fromName; // 发件人
+        $from = $plugin->admin_mail; // 站长邮箱
+        $fromName = $plugin->from_name; // 发件人
         $recipients = [];
         // 审核通过
         if ($comment->status == 'approved') {
@@ -426,9 +426,9 @@ public static function resendMail($param)
         // 获取系统配置选项
         $options = Options::alloc();
         $plugin = $options->plugin('CommentNotifier');
-        if($plugin->zznotice==1&&$param['to']==$plugin->adminfrom){return;}//不通知站长邮箱
+        if($plugin->notify_admin==0&&$param['to']==$plugin->admin_mail){return;} //不通知站长
         
-        if($plugin->yibu==1){
+        if($plugin->async==1){
         // 启用异步时: 仅入队, 待响应发出后在本进程内统一发送(不走HTTP回环, 不依赖额外worker)
         self::queueAsyncMail($param);
         }else{
@@ -502,7 +502,7 @@ public static function send($param){
     
     // 消除下方注释后这里会睡眠10秒，可测试异步提交是否真正提速了
     //sleep(10);
-    if($plugin->tuisongtype=='aliyun'){
+    if($plugin->driver=='aliyun'){
         self::aliyun($param);
     }else{
         self::zemail($param);
@@ -518,27 +518,27 @@ public static function zemail($param)
         $plugin = $options->plugin('CommentNotifier');
         
         $smtptype='go';
-        if($plugin->tuisongtype=='api'&&$plugin->api_url){
+        if($plugin->driver=='api'&&$plugin->api_url){
         $apiurl=$plugin->api_url;
         $smtptype='curl';
         }
         $flag = FALSE;
 if($smtptype=="go"){
 try {
-            $from = $plugin->from; // 发件邮箱
-            $fromName = $plugin->fromName; // 发件人
+            $from = $plugin->smtp_from; // 发件邮箱
+            $fromName = $plugin->from_name; // 发件人
             // Server settings
             $mail = new PHPMailer(false);
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
             $mail->Encoding = PHPMailer::ENCODING_BASE64;
             $mail->isSMTP();
             $mail->Timeout = 10; // SMTP 超时(秒), 防止收尾阶段卡死占用worker
-            $mail->Host = $plugin->STMPHost; // SMTP 服务地址
+            $mail->Host = $plugin->smtp_host; // SMTP 服务地址
             $mail->SMTPAuth = true; // 开启认证
-            $mail->Username = $plugin->SMTPUserName; // SMTP 用户名
-            $mail->Password = $plugin->SMTPPassword; // SMTP 密码
-            $mail->SMTPSecure = $plugin->SMTPSecure; // SMTP 加密类型 'ssl' or 'tls'.
-            $mail->Port = $plugin->SMTPPort; // SMTP 端口
+            $mail->Username = $plugin->smtp_user; // SMTP 用户名
+            $mail->Password = $plugin->smtp_pass; // SMTP 密码
+            $mail->SMTPSecure = $plugin->smtp_secure; // SMTP 加密类型 'ssl' or 'tls'.
+            $mail->Port = $plugin->smtp_port; // SMTP 端口
 
             $mail->setFrom($from, $fromName);
             $mail->addAddress($param['to'], $param['fromName']); // 收件人
@@ -655,7 +655,7 @@ try {
         // 获取插件配置
         $plugin = $options->plugin('CommentNotifier');
         // 判断当前请求区域
-        switch ( $plugin->ali_region ) {
+        switch ( $plugin->aliyun_region ) {
             case 'hangzhou': // 杭州
                 // API地址
                 $param['api'] = 'https://dm.aliyuncs.com/';
@@ -684,7 +684,7 @@ try {
         // 重新组合为阿里云所使用的参数
         $data = array(
             'Action' => 'SingleSendMail', // 操作接口名
-            'AccountName' => $plugin->ali_from, // 发件地址
+            'AccountName' => $plugin->aliyun_from, // 发件地址
             'ReplyToAddress' => "true", // 回信地址
             'AddressType' => 1, // 地址类型
             'ToAddress' => $param['to'], // 收件地址
@@ -693,7 +693,7 @@ try {
             'HtmlBody' => $param['html'], // 邮件内容
             'Format' => 'JSON', // 返回JSON
             'Version' => $param['version'], // API版本号
-            'AccessKeyId' => $plugin->ali_accesskey_id, // Access Key ID
+            'AccessKeyId' => $plugin->aliyun_accesskey_id, // Access Key ID
             'SignatureMethod' => 'HMAC-SHA1', // 签名方式
             'Timestamp' => gmdate('Y-m-d\TH:i:s\Z'), // 请求时间
             'SignatureVersion' => '1.0', // 签名算法版本
@@ -701,7 +701,7 @@ try {
             'RegionId' => $param['region'] // 机房信息
         );
         // 请求签名
-        $data['Signature'] = self::sign($data, $plugin->ali_accesskey_secret);
+        $data['Signature'] = self::sign($data, $plugin->aliyun_accesskey_secret);
         // 初始化Curl
         $ch = curl_init();
         // 设置为POST请求
@@ -798,8 +798,8 @@ try {
         
         $post=Helper::widgetById('Contents', $comment->cid);
         
-        if($plugin->biaoqing&&is_callable($plugin->biaoqing)){//表情函数重载
-        $parseBiaoQing = $plugin->biaoqing;
+        if($plugin->biaoqing_parser&&is_callable($plugin->biaoqing_parser)){//表情函数重载
+        $parseBiaoQing = $plugin->biaoqing_parser;
         $commentText = $parseBiaoQing($commentText);
         $Ptext = $parseBiaoQing($Ptext);
         }
@@ -987,7 +987,7 @@ try {
     public static function footerjs()
     {
         $plugin = Options::alloc()->plugin('CommentNotifier');
-        if(!empty($plugin->tool) && in_array('passport', $plugin->tool)){
+        if(!empty($plugin->passport) && in_array('passport', $plugin->passport)){
         \Widget\User::alloc()->to($user);
         if (!$user->hasLogin()&&strpos(Helper::options()->request->getRequestUrl(), "/login.php") !== false){
             $url=Helper::options()->siteUrl.'password/forgot'; 

@@ -1,8 +1,13 @@
-# typecho-CommentNotifier
+# Typecho-Plugin-CommentNotifier
 
 #### 项目介绍
 
-Typecho博客评论邮件提醒，支持异步回调（异步回调优点就是减小对博客评论提交速度的影响），支持编辑邮件模板，支持第三方开发邮件模板，发信方式支持SMTP与阿里云邮箱推送，支持通过邮箱进行账号密码找回功能
+- Typecho 博客评论邮件提醒，修改自 https://github.com/jrotty/CommentNotifier
+- 使用 `fastcgi_finish_request` 的进程内异步发信方案替换 `requestService`，降低因绕路公网导致失败的可能性
+- 支持异步回调，减小对博客评论提交速度的影响
+- 支持邮件模板
+- 支持 SMTP、阿里云邮件推送、API 三种发信方式
+- 支持接入邮件密码找回
 
 #### 安装教程
 
@@ -13,14 +18,17 @@ Typecho博客评论邮件提醒，支持异步回调（异步回调优点就是�
 - 支持显示大部分主题的评论表情
 
 ### 插件升级
+
 小版本升级直接覆盖就行，大版本升级时需要禁用删除旧版本的文件，然后传新的上去！（如果直接覆盖升级了，就禁用重启下）。
 
-### 评论表情实现原理
-其实很简单，正常主题表情都是用特殊格式文本进行输入的，然后主题表情函数将文本替换成img标签，进而输出评论内容。而这个插件就是需要用户将这个函数名填入进去，这样用户评论成功后，在发送邮件内容时也可以执行主题的这个函数进而替换评论内容。
+⚠️ 从原版换过来同样需要先禁用再启用，然后重新配置。
 
-另外我的这些` Sinner` ，` Dinner` ，` Plain` ，` Sola` ，` Make` ，` Winner`，`Hani`主题表情回调函数为：parseBiaoQing ，其他主题回调函数请教下主题作者，部分主题也许会不会兼容，这个需要主题作者适配了。【只适合图片格式，svg的不支持】
+### 表情回调函数
 
-同时`img`标签的`class="biaoqing"`会被插件替换成内置的样式，宽度会被限制为30px，如果您有多个`class`请这样写`class="biaoqing otherclass"`请保证`biaoqing`处于`class`的最前面
+https://github.com/jrotty 的主题填写 `parseBiaoQing`
+https://github.com/MoXiaoXi233/PureSuck-theme 填写 `parseOwOcodes`
+
+同时 `img` 标签的 `class="biaoqing"` 会被插件替换成内置的样式，宽度会被限制为 30px，如果您有多个 `class` 请这样写 `class="biaoqing otherclass"` 请保证 `biaoqing` 处于 `class` 的最前面
 
 #### 软件架构
 
@@ -30,6 +38,7 @@ Typecho博客评论邮件提醒，支持异步回调（异步回调优点就是�
 - 邮件服务基于[`PHPMailer`](https://github.com/PHPMailer/PHPMailer/ )
 
 #### 发信逻辑
+
 文章收到新评论后，如果评论有父级，则发提醒给父级评论，否则发给提醒给文章作者；
 如果文章作者邮箱为空，则发提醒给站长邮箱（需要在插件设置里设置）；
 
@@ -43,14 +52,3 @@ Typecho博客评论邮件提醒，支持异步回调（异步回调优点就是�
 在**控制台**→**评论邮件模板**里可以切换以及编辑模板
 
 `template`文件夹里存放的就是邮件发信模板，大家可以参考内置的几个模板来写属于自己的邮件模板，当然也可以在后台直接修改默认模板来达到邮件美化的作用！
-
-
-#### 感谢
-
-[https://gitee.com/HoeXhe/typecho-Comment2Mail](https://gitee.com/HoeXhe/typecho-Comment2Mail)
-
-[https://github.com/typecho-fans/plugins/tree/master/CommentToMail](https://github.com/typecho-fans/plugins/tree/master/CommentToMail)
-
-[https://github.com/ylqjgm/LoveKKComment/](https://github.com/ylqjgm/LoveKKComment/)
-
-[https://github.com/mhcyong/Passport](https://github.com/mhcyong/Passport)
