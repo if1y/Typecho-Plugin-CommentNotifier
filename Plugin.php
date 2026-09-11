@@ -20,12 +20,12 @@ require dirname(__FILE__) . '/PHPMailer/SMTP.php';
 require dirname(__FILE__) . '/PHPMailer/Exception.php';
 
 /**
- * typecho评论邮件提醒插件/用户账号密码找回插件,要求typecho1.2及以上<br>其他付费产品：<a href="https://typecho.fans/"target="_blank" rel="noopener noreferrer">https://typecho.fans/</a>
+ * Typecho 评论邮件提醒，基于 fastcgi_finish_request 的进程内异步发信方案
  * 
  * @package CommentNotifier
- * @author 泽泽社长
- * @version 1.9.2
- * @link https://github.com/jrotty/CommentNotifier
+ * @author  if1y
+ * @version 2.0.0
+ * @link    https://github.com/if1y/Typecho-Plugin-CommentNotifier
  */
 
 class Plugin implements PluginInterface
