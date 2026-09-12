@@ -406,11 +406,11 @@ $('.'+$("#driver :radio:checked").val()).show();
             $options = Options::alloc();
             $plugin = $options->plugin('CommentNotifier');
             if ($type == 1) {
-                $Subject = '你在[' . $comment->title . ']的评论有了新的回复';
+                $Subject = '您在《' . $comment->title . '》的评论有新回复';
             } elseif ($type == 2) {
-                $Subject = '文章《' . $comment->title . '》有条待审评论';
+                $Subject = '文章《' . $comment->title . '》有评论待审核';
             } else {
-                $Subject = '你的《' . $comment->title . '》文章有了新的评论';
+                $Subject = '文章《' . $comment->title . '》有新的评论';
             }
             foreach ($recipients as $recipient) {
             $param['to']=$recipient['mail']; // 收件地址
