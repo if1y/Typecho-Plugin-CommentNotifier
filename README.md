@@ -26,9 +26,12 @@
 ### 表情回调函数
 
 https://github.com/jrotty 的主题填写 `parseBiaoQing`
+
 https://github.com/MoXiaoXi233/PureSuck-theme 填写 `parseOwOcodes`
 
-同时 `img` 标签的 `class="biaoqing"` 会被插件替换成内置的样式，宽度会被限制为 30px，如果您有多个 `class` 请这样写 `class="biaoqing otherclass"` 请保证 `biaoqing` 处于 `class` 的最前面
+同时 `img` 标签的 `class="biaoqing"` 会被插件替换成内置的样式，宽度会被限制为 30px，如果您有多个 `class` 请这样写 `class="biaoqing otherclass"` 请保证 `biaoqing` 处于 `class` 的最前面。
+
+如果主题使用其它 `class` 名称，则表情尺寸可能会遵循主题配置。 
 
 #### 软件架构
 
